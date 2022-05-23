@@ -27,7 +27,7 @@ const register = (data) => {
                 isAdult: data.isAdult,
                 isStaff: data.isStaff,
                 code: data.code,
-                workerToken: data.purpose === "worker" ? token : {}
+                workerToken: data.purpose === "charity_worker" ? token : {}
             }
             db.addDoc("account", data.email, accData)
             db.addDoc("token", token.token, { date: token.date, time: token.time })

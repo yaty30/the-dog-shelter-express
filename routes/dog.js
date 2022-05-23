@@ -9,7 +9,7 @@ const getAllDogs = () => {
 
 const conductAddDog = (data, id) => {
     let dogData = {
-        id: id,
+        id: +id,
         name: data.name,
         gender: data.gender,
         location: data.location,
@@ -25,7 +25,7 @@ const conductAddDog = (data, id) => {
         weight: data.weight,
         addedBy: data.addedBy,
     }
-    db.addDoc("dog", id, dogData)
+    db.addDoc("dog", `${id}`, dogData)
 
     return "done"
 }
@@ -36,6 +36,19 @@ const addDog = (data) => {
             console.log("ok")
             let id = utils.randomNumbers(5)
             return conductAddDog(data, id)
+        } else {
+            console.log("invalid token")
+            return "invalid token"
+        }
+    })
+}
+
+const addDogImage = (data) => {
+    db.getDoc("token", data.token).then((res) => {
+        if (res !== null) {
+            console.log("ok")
+            let id = utils.randomNumbers(5)
+            db.addDoc("dogImage", `${data.id}`, { src: data.image })
         } else {
             console.log("invalid token")
             return "invalid token"
@@ -81,6 +94,18 @@ const updateDog = (data) => {
     })
 }
 
+const getFavouriteList = (data) => {
+    let id = data.id
+    let list = []
+    return db.getDoc("favouriteList", `${id}`)
+        .then(x => {
+            x.list.map(xi => list.push(+xi))
+        })
+        .then(re => {
+            return list
+        })
+}
+
 const addFavourite = (data) => {
     let id = data.id
     let newFavouriteID = data.newFavouriteID
@@ -110,12 +135,15 @@ const removeFavourite = (data) => {
             )
         })
         .then(_ => {
-            db.addDoc("favouriteList", id, { list: list })
-            return list
+            return db.addDoc("favouriteList", id, { list: list })
+                .then((d) => {
+                    return list
+                })
         })
 }
 
 module.exports = {
     getAllDogs, addDog, removeDog,
-    updateDog, addFavourite, removeFavourite
+    updateDog, addFavourite, removeFavourite,
+    addDogImage, getFavouriteList
 };

@@ -7,6 +7,8 @@ var login = require('./login')
 var dog = require('./dog')
 
 router.use(cors());
+router.use(express.json({ limit: '1024mb' }));
+router.use(express.urlencoded({ limit: '1024mb' }));
 
 router.get('/all', (req, res) => {
   // database.addDoc("account", "test", {name: "test", country: "test", date: "now"})
@@ -57,6 +59,14 @@ router.post('/dog/addDog', (req, res) => {
   return result
 })
 
+router.post('/dog/addDogImage', (req, res) => {
+  return dog.addDogImage(req.body)
+    .then((x) => {
+      res.send(x)
+      return x
+    })
+})
+
 router.post('/dog/removeDog', (req, res) => {
   let result = dog.removeDog(req.body)
   res.send(result)
@@ -78,6 +88,13 @@ router.post('/dog/favouriteList/add', (req, res) => {
 
 router.post('/dog/favouriteList/remove', (req, res) => {
   return dog.removeFavourite(req.body).then((x) => {
+    res.send(x)
+    return x
+  })
+})
+
+router.post('/dog/favouriteList/getList', (req, res) => {
+  return dog.getFavouriteList(req.body).then((x) => {
     res.send("")
     return x
   })

@@ -62,7 +62,6 @@ const removeDog = (data) => {
 }
 
 const conductUpdateDog = (data) => {
-    conductRemoveDog(data)
     conductAddDog(data, `${data.id}`)
 
     return "done"
@@ -82,8 +81,41 @@ const updateDog = (data) => {
     })
 }
 
+const addFavourite = (data) => {
+    let id = data.id
+    let newFavouriteID = data.newFavouriteID
+    let list = []
+    return db.getDoc("favouriteList", id)
+        .then(x => {
+            x.list.map(y => list.push(y))
+        }).then(_ => {
+            if (list.filter(f => f === newFavouriteID).length === 0) {
+                list.push(newFavouriteID)
+                db.addDoc("favouriteList", id, { list: list })
+                return list
+            } else {
+                return "target already exist in the favourite list"
+            }
+        })
+}
+
+const removeFavourite = (data) => {
+    let id = data.id
+    let targetID = data.targetID
+    let list = []
+    return db.getDoc("favouriteList", id)
+        .then(x => {
+            x.list.map(y =>
+                y !== targetID && list.push(y)
+            )
+        })
+        .then(_ => {
+            db.addDoc("favouriteList", id, { list: list })
+            return list
+        })
+}
 
 module.exports = {
     getAllDogs, addDog, removeDog,
-    updateDog
+    updateDog, addFavourite, removeFavourite
 };

@@ -6,14 +6,15 @@ const createUser = (item) => {
         email: item.email,
         password: item.password
     }
-    db.addDoc("users", item.id, data)
+    db.addDoc("users", `${item.id}`, data)
 }
 
 const register = (data) => {
-    db.getDoc("account", data.email).then((res) => {
+    return db.getDoc("account", data.email).then((res) => {
         if (res === null) {
             let token = utils.generateToken()
             let id = utils.randomNumbers(5)
+            console.log(data)
             let accData = {
                 id: +id,
                 email: data.email,
@@ -36,9 +37,9 @@ const register = (data) => {
             }
             
             let userData = {
-                id: accData.id,
-                email: accData.email,
-                password: accData.password
+                id: id,
+                email: data.email,
+                password: data.password
             }
             createUser(userData)
 

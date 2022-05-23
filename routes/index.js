@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var database = require('../firebase')
+var cors = require('cors');
 var register = require('./register')
 var login = require('./login')
 var dog = require('./dog')
+
+router.use(cors());
 
 router.get('/all', (req, res) => {
   // database.addDoc("account", "test", {name: "test", country: "test", date: "now"})
@@ -17,10 +20,10 @@ router.get('/all', (req, res) => {
 });
 
 router.post('/register', (req, res) => {
-  let result = register.register(req.body)
-  res.send(result)
-
-  return result
+  register.register(req.body).then(r => {
+    res.send("")
+    return r
+  })
 })
 
 router.post('/add', (req, res) => {
@@ -29,9 +32,10 @@ router.post('/add', (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-  let result = login.login(req.body)
-  res.send(result)
-  return result
+  return login.login(req.body).then((x) => {
+    res.send(x)
+    return x
+  })
 })
 
 
@@ -65,6 +69,19 @@ router.post('/dog/updateDog', (req, res) => {
   return result
 })
 
+router.post('/dog/favouriteList/add', (req, res) => {
+  return dog.addFavourite(req.body).then((x) => {
+    res.send(x)
+    return x
+  })
+})
+
+router.post('/dog/favouriteList/remove', (req, res) => {
+  return dog.removeFavourite(req.body).then((x) => {
+    res.send("")
+    return x
+  })
+})
 
 
 module.exports = router;

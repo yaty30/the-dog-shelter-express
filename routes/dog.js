@@ -94,15 +94,11 @@ const updateDog = (data) => {
     })
 }
 
-const getFavouriteList = (data) => {
-    let id = data.id
+const getFavouriteList = (id) => {
     let list = []
     return db.getDoc("favouriteList", `${id}`)
         .then(x => {
-            x.list.map(xi => list.push(+xi))
-        })
-        .then(re => {
-            return list
+            return x.list
         })
 }
 

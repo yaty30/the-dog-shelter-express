@@ -46,9 +46,6 @@ router.get('/dog/getAllDogs', (req, res) => {
 
   return dog.getAllDogs().then((x) => {
     res.send(JSON.stringify(x))
-    x.map((info, i) =>
-      result.push(info)
-    )
     return x
   })
 })
@@ -81,7 +78,7 @@ router.post('/dog/updateDog', (req, res) => {
 
 router.post('/dog/favouriteList/add', (req, res) => {
   return dog.addFavourite(req.body).then((x) => {
-    res.send(x)
+    res.send(JSON.stringify(x))
     return x
   })
 })
@@ -96,6 +93,14 @@ router.post('/dog/favouriteList/remove', (req, res) => {
 router.post('/dog/favouriteList/getList', (req, res) => {
   return dog.getFavouriteList(req.body).then((x) => {
     res.send("")
+    return x
+  })
+})
+
+router.get('/dog/favouriteList/getList', (req, res) => {
+  let id = `${req.query.id}`
+  return dog.getFavouriteList(id).then((x) => {
+    res.send(JSON.stringify(x))
     return x
   })
 })

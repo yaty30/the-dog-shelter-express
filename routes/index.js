@@ -5,6 +5,8 @@ var cors = require('cors');
 var register = require('./register')
 var login = require('./login')
 var dog = require('./dog')
+var chat = require('./chat')
+var worker = require('./worker')
 
 router.use(cors());
 router.use(express.json({ limit: '1024mb' }));
@@ -39,7 +41,6 @@ router.post('/login', (req, res) => {
     return x
   })
 })
-
 
 router.get('/dog/getAllDogs', (req, res) => {
   let result = []
@@ -105,5 +106,51 @@ router.get('/dog/favouriteList/getList', (req, res) => {
   })
 })
 
+router.post('/contact/sendMessage', (req, res) => {
+  res.send(req.body)
+  return true
+})
+
+router.get('/chat/client/getChatMaessages', (req, res) => {
+  return chat.clientGetMessages(req.query.chatID)
+    .then((x) => {
+      res.send(x)
+      return x
+    })
+})
+
+router.get('/chat/worker/getChatMessages', (req, res) => {
+  return chat.workerGetMessage(req.query.workerID)
+    .then((x) => {
+      res.send(x)
+      return x
+    })
+})
+
+router.post('/chat/sendChatMessage', (req, res) => {
+  let result = chat.sendChatMessage(req.body)
+  res.send(JSON.stringify(req.body))
+  return result
+})
+
+router.post('/chat/removeChatMessage', (req, res) => {
+  let result = chat.removeChatMessage(req.body)
+  res.send(JSON.stringify(req.body))
+  return result
+})
+
+router.post('/chat/setChatExpire', (req, res) => {
+  let result = chat.setChatExpire(req.body.chatID)
+  res.send(result)
+  return result
+})
+
+router.get('/worker/getAllWorkers', (req,res) => {
+  return worker.getAllWorkers()
+    .then((x) => {
+      res.send(x)
+      return x
+    })
+})
 
 module.exports = router;

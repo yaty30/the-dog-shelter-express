@@ -9,7 +9,8 @@ const login = (data) => {
         } else {
             let id = res.id
             return db.getDoc("users", `${id}`).then((ex) => {
-                if(ex.password === data.password) {
+                console.log(ex.password)
+                if(atob(ex.password) == atob(data.password)) {
                     console.log("logined")
                     return {
                         id: +id,

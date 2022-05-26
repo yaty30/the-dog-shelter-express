@@ -2,22 +2,38 @@ var db = require('../firebase')
 var utils = require("../utils")
 var worker = require("./worker")
 
-const sendChatMessage = (data) => {
-    let messages = []
-    let messageID = +utils.randomNumbers(5)
-    let chatData = {
-        chatID: data.chatID,
-        messageID: messageID,
-        message: data.message,
-        clientID: data.clientID,
-        workerID: 1,
-        sendTime: data.sendTime,
-        expired: false,
-        date: utils.getDatetime("date"),
-        time: utils.getDatetime("time")
-    }
+const generateMessageID = (chatID) => {
+    let list = []
+    return clientGetMessages(chatID).then((x) => {
+        x.map((id) =>
+            list.push(id.orderID)
+        )
+    }).then(() => {
+        console.log(Math.max(list) + 1)
+        return Math.max(list) + 1
+    })
+}
 
-    db.addDoc("chat", `${data.chatID}_${messageID}`, chatData)
+const sendChatMessage = (data) => {
+    let messageID = +utils.randomNumbers(5)
+    generateMessageID(data.chatID).then((orderID) => {
+        let chatData = {
+            chatID: data.chatID,
+            messageID: messageID,
+            message: data.message,
+            clientID: data.clientID,
+            workerID: 88731,
+            sendTime: data.sendTime,
+            sendBy: data.sendBy,
+            expired: false,
+            orderID: orderID,
+            date: utils.getDatetime("date"),
+            time: utils.getDatetime("time")
+        }
+
+        db.addDoc("chat", `${data.chatID}_${messageID}`, chatData)
+
+    })
 
     // return chatData
 }
@@ -33,9 +49,56 @@ const clientGetMessages = (data) => {
     console.log(data)
     return db.getAllDocs("chat")
         .then(res => {
-            res.filter(x =>
-                x.chatID.includes(data) && messages.push(x)
-            )
+            if (res !== null) {
+                res.map(x =>
+                    x.chatID === data && messages.push(x)
+                )
+            }
+        })
+        .then(() => {
+            return messages
+        })
+}
+
+const clientGetMessagesByID = (data) => {
+    let messages = []
+    return db.getAllDocs("chat")
+        .then(res => {
+            if (res !== null) {
+                res.map(x =>
+                    x.clientID === +data && messages.push(x)
+                )
+            }
+        })
+        .then(() => {
+            return messages
+        })
+}
+
+const workerGetMessagesByID = (data) => {
+    let messages = []
+    return db.getAllDocs("chat")
+        .then(res => {
+            if (res !== null) {
+                res.map(x =>
+                    x.workerID === +data && messages.push(x)
+                )
+            }
+        })
+        .then(() => {
+            return messages
+        })
+}
+
+const getMessagesByID = (data) => {
+    let messages = []
+    return db.getAllDocs("chat")
+        .then(res => {
+            if (res !== null) {
+                res.map(x =>
+                    x.clientID === +data && messages.push(x)
+                )
+            }
         })
         .then(() => {
             return messages
@@ -80,5 +143,6 @@ const workerGetMessage = (data) => {
 module.exports = {
     sendChatMessage, removeChatMessage,
     clientGetMessages, setChatExpire,
-    workerGetMessage
+    workerGetMessage, clientGetMessagesByID,
+    workerGetMessagesByID
 };

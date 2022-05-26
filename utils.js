@@ -60,8 +60,12 @@ const getDatetime = (type) => {
     }
 }
 
+const res = (status, result) => {
+    return { status: status, result: result }
+}
+
 module.exports = {
     randomString, getDatetime,
     randomNumbers, generateToken, 
-    allowed
+    allowed, res
 }

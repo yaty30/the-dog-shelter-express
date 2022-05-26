@@ -31,6 +31,7 @@ const conductAddDog = (data, id) => {
 }
 
 const addDog = (data) => {
+    console.log(data)
     db.getDoc("token", data.token).then((res) => {
         if (res !== null) {
             console.log("ok")

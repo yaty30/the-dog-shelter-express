@@ -7,6 +7,7 @@ var login = require('./login')
 var dog = require('./dog')
 var chat = require('./chat')
 var worker = require('./worker')
+var utils = require('../utils')
 
 router.use(cors());
 router.use(express.json({ limit: '1024mb' }));
@@ -38,7 +39,7 @@ router.post('/add', (req, res) => {
 router.post('/login', (req, res) => {
   return login.login(req.body).then((x) => {
     res.send(x)
-    return x
+    return utils.res(res.statusCode, x)
   })
 })
 
@@ -47,54 +48,54 @@ router.get('/dog/getAllDogs', (req, res) => {
 
   return dog.getAllDogs().then((x) => {
     res.send(JSON.stringify(x))
-    return x
+    return utils.res(res.statusCode, x)
   })
 })
 
 router.post('/dog/addDog', (req, res) => {
   let result = dog.addDog(req.body)
   res.send(result)
-  return result
+  return utils.res(res.statusCode, result)
 })
 
 router.post('/dog/addDogImage', (req, res) => {
   return dog.addDogImage(req.body)
     .then((x) => {
       res.send(x)
-      return x
+      return utils.res(res.statusCode, x)
     })
 })
 
 router.post('/dog/removeDog', (req, res) => {
   let result = dog.removeDog(req.body)
   res.send(result)
-  return result
+  return utils.res(res.statusCode, result)
 })
 
 router.post('/dog/updateDog', (req, res) => {
   let result = dog.updateDog(req.body)
   res.send(result)
-  return result
+  return utils.res(res.statusCode, result)
 })
 
 router.post('/dog/favouriteList/add', (req, res) => {
   return dog.addFavourite(req.body).then((x) => {
     res.send(JSON.stringify(x))
-    return x
+    return utils.res(res.statusCode, x)
   })
 })
 
 router.post('/dog/favouriteList/remove', (req, res) => {
   return dog.removeFavourite(req.body).then((x) => {
     res.send(x)
-    return x
+    return utils.res(res.statusCode, x)
   })
 })
 
 router.post('/dog/favouriteList/getList', (req, res) => {
   return dog.getFavouriteList(req.body).then((x) => {
     res.send("")
-    return x
+    return utils.res(res.statusCode, x)
   })
 })
 
@@ -102,20 +103,20 @@ router.get('/dog/favouriteList/getList', (req, res) => {
   let id = `${req.query.id}`
   return dog.getFavouriteList(id).then((x) => {
     res.send(JSON.stringify(x))
-    return x
+    return utils.res(res.statusCode, x)
   })
 })
 
 router.post('/contact/sendMessage', (req, res) => {
   res.send(req.body)
-  return true
+  return utils.res(res.statusCode, true)
 })
 
-router.get('/chat/client/getChatMaessages', (req, res) => {
+router.get('/chat/client/getChatMessages', (req, res) => {
   return chat.clientGetMessages(req.query.chatID)
     .then((x) => {
       res.send(x)
-      return x
+      return utils.res(res.statusCode, x)
     })
 })
 
@@ -123,33 +124,49 @@ router.get('/chat/worker/getChatMessages', (req, res) => {
   return chat.workerGetMessage(req.query.workerID)
     .then((x) => {
       res.send(x)
-      return x
+      return utils.res(res.statusCode, x)
     })
 })
 
 router.post('/chat/sendChatMessage', (req, res) => {
   let result = chat.sendChatMessage(req.body)
   res.send(JSON.stringify(req.body))
-  return result
+  return utils.res(res.statusCode, result)
 })
 
 router.post('/chat/removeChatMessage', (req, res) => {
   let result = chat.removeChatMessage(req.body)
   res.send(JSON.stringify(req.body))
-  return result
+  return utils.res(res.statusCode, result)
+})
+
+router.get('/chat/clientGetMessagesByID', (req, res) => {
+  return chat.clientGetMessagesByID(req.query.clientID)
+    .then((x) => {
+      res.send(x)
+      return utils.res(res.statusCode, x)
+    })
+})
+
+router.get('/chat/workerGetMessagesByID', (req, res) => {
+  return chat.workerGetMessagesByID(req.query.workerID)
+    .then((x) => {
+      res.send(x)
+      return utils.res(res.statusCode, x)
+    })
 })
 
 router.post('/chat/setChatExpire', (req, res) => {
   let result = chat.setChatExpire(req.body.chatID)
   res.send(result)
-  return result
+  return utils.res(res.statusCode, result)
 })
 
-router.get('/worker/getAllWorkers', (req,res) => {
+router.get('/worker/getAllWorkers', (req, res) => {
   return worker.getAllWorkers()
     .then((x) => {
       res.send(x)
-      return x
+      return utils.res(res.statusCode, x)
     })
 })
 

@@ -1,148 +1,80 @@
+const { doc, getDoc } = require('firebase/firestore')
 var db = require('../firebase')
 var utils = require("../utils")
 var worker = require("./worker")
 
-const generateMessageID = (chatID) => {
+const getMessageOrderID = (chatID) => {
     let list = []
-    return clientGetMessages(chatID).then((x) => {
-        x.map((id) =>
-            list.push(id.orderID)
+    return db.getAllDocs("chat")
+        .then((res) =>
+            res.map(x =>
+                x.chatID === chatID && list.push(x)
+            )
         )
-    }).then(() => {
-        console.log(Math.max(list) + 1)
-        return Math.max(list) + 1
-    })
+        .then(() => list.length + 1)
 }
 
-const sendChatMessage = (data) => {
-    let messageID = +utils.randomNumbers(5)
-    generateMessageID(data.chatID).then((orderID) => {
-        let chatData = {
+const createNewChat = (data) => {
+    return worker.getAllWorkerIDs()
+        .then((workerID) => {
+            let chatID = utils.randomString(15)
+            let messageID = utils.randomString(25)
+            let messageBody = {
+                message: data.message,
+                from: data.from,
+                to: workerID[Math.floor(Math.random() * workerID.length)],
+                date: utils.getDatetime("date"),
+                time: utils.getDatetime("time"),
+                chatID: chatID,
+                messageID: messageID,
+                orderID: 1
+            }
+
+            return db.addDoc("chat", `${chatID}_${messageID}`, messageBody)
+                .then(() => messageBody)
+        })
+}
+
+const replyMessage = (data) => {
+    let messageID = utils.randomString(25)
+    return getMessageOrderID(data.chatID).then((orderID) => {
+        let messageBody = {
+            message: data.message,
+            from: data.from,
+            to: data.to,
+            date: utils.getDatetime("date"),
+            time: utils.getDatetime("time"),
             chatID: data.chatID,
             messageID: messageID,
-            message: data.message,
-            clientID: data.clientID,
-            workerID: 88731,
-            sendTime: data.sendTime,
-            sendBy: data.sendBy,
-            expired: false,
-            orderID: orderID,
-            date: utils.getDatetime("date"),
-            time: utils.getDatetime("time")
+            orderID: orderID
         }
 
-        db.addDoc("chat", `${data.chatID}_${messageID}`, chatData)
-
+        return db.addDoc("chat", `${data.chatID}_${messageID}`, messageBody)
+            .then(() => messageBody)
     })
-
-    // return chatData
 }
 
-const removeChatMessage = (data) => {
-    let id = `${data.chatID}_${data.messageID}`
-
-    return db.removeDoc("chat", id)
-}
-
-const clientGetMessages = (data) => {
-    let messages = []
+const deleteMessage = (data) => {
     console.log(data)
-    return db.getAllDocs("chat")
-        .then(res => {
-            if (res !== null) {
-                res.map(x =>
-                    x.chatID === data && messages.push(x)
-                )
-            }
-        })
-        .then(() => {
-            return messages
-        })
+    return db.removeDoc("chat", `${data.chatID}_${data.messageID}`)
+        .then((res) =>
+            res
+        )
 }
 
-const clientGetMessagesByID = (data) => {
-    let messages = []
+const restoreMessage = (userID) => {
+    let list = []
     return db.getAllDocs("chat")
-        .then(res => {
-            if (res !== null) {
-                res.map(x =>
-                    x.clientID === +data && messages.push(x)
-                )
-            }
+        .then((res) => {
+            console.log(res)
+            res.map((x, i) => {
+                (x.from === +userID || x.to === +userID) && list.push(x)
+            })
         })
-        .then(() => {
-            return messages
-        })
-}
-
-const workerGetMessagesByID = (data) => {
-    let messages = []
-    return db.getAllDocs("chat")
-        .then(res => {
-            if (res !== null) {
-                res.map(x =>
-                    x.workerID === +data && messages.push(x)
-                )
-            }
-        })
-        .then(() => {
-            return messages
-        })
-}
-
-const getMessagesByID = (data) => {
-    let messages = []
-    return db.getAllDocs("chat")
-        .then(res => {
-            if (res !== null) {
-                res.map(x =>
-                    x.clientID === +data && messages.push(x)
-                )
-            }
-        })
-        .then(() => {
-            return messages
-        })
-}
-
-const setChatExpire = (data) => {
-    let messages = []
-    return db.getAllDocs("chat")
-        .then(res => {
-            res.filter(x =>
-                x.chatID.includes(data) && messages.push({
-                    ...x,
-                    expired: true
-                })
-            )
-        })
-        .then(() => {
-            messages.map((c, i) =>
-                db.addDoc("chat", `${c.chatID}_${c.messageID}`, c)
-            )
-        })
-        .then(() => {
-            return "updated"
-        })
-}
-
-const workerGetMessage = (data) => {
-    let messages = []
-    return db.getAllDocs("chat")
-        .then(res => {
-            res.filter(x =>
-                x.workerID === +data && messages.push(x)
-            )
-        })
-        .then(() => {
-            console.log(messages)
-            return messages
-        })
+        .then(() => list)
 }
 
 module.exports = {
-    sendChatMessage, removeChatMessage,
-    clientGetMessages, setChatExpire,
-    workerGetMessage, clientGetMessagesByID,
-    workerGetMessagesByID
+    createNewChat, replyMessage, 
+    deleteMessage, restoreMessage
 };

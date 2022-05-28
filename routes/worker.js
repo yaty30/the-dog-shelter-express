@@ -14,6 +14,17 @@ const getAllWorkers = () => {
         })
 }
 
+const getAllWorkerIDs = () => {
+    let workerIDs = []
+    return db.getAllDocs("account")
+        .then(res => {
+            res.filter(x => x.purpose !== "adopt").map(id => 
+                workerIDs.push(+id.id)    
+            )
+        })
+        .then(() => workerIDs)
+}
+
 module.exports = {
-    getAllWorkers
+    getAllWorkers, getAllWorkerIDs
 };

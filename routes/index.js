@@ -107,67 +107,40 @@ router.get('/dog/favouriteList/getList', (req, res) => {
   })
 })
 
-router.post('/contact/sendMessage', (req, res) => {
-  res.send(req.body)
-  return utils.res(res.statusCode, true)
-})
-
-router.get('/chat/client/getChatMessages', (req, res) => {
-  return chat.clientGetMessages(req.query.chatID)
+router.post('/chat/createNewChat', (req, res) => {
+  console.log(req.body)
+  return chat.createNewChat(req.body)
     .then((x) => {
-      res.send(x)
-      return utils.res(res.statusCode, x)
+      res.send(JSON.stringify(x))
+      return x
     })
 })
 
-router.get('/chat/worker/getChatMessages', (req, res) => {
-  return chat.workerGetMessage(req.query.workerID)
+router.post('/chat/replyMessage', (req, res) => {
+  return chat.replyMessage(req.body)
     .then((x) => {
-      res.send(x)
-      return utils.res(res.statusCode, x)
+      res.send(JSON.stringify(x))
+      return x
     })
 })
 
-router.post('/chat/sendChatMessage', (req, res) => {
-  let result = chat.sendChatMessage(req.body)
-  res.send(JSON.stringify(req.body))
-  return utils.res(res.statusCode, result)
-})
-
-router.post('/chat/removeChatMessage', (req, res) => {
-  let result = chat.removeChatMessage(req.body)
-  res.send(JSON.stringify(req.body))
-  return utils.res(res.statusCode, result)
-})
-
-router.get('/chat/clientGetMessagesByID', (req, res) => {
-  return chat.clientGetMessagesByID(req.query.clientID)
+router.post('/chat/deleteMessage', (req, res) => {
+  return chat.deleteMessage(req.body)
     .then((x) => {
-      res.send(x)
-      return utils.res(res.statusCode, x)
+      res.send(JSON.stringify(x))
+      return x
     })
 })
 
-router.get('/chat/workerGetMessagesByID', (req, res) => {
-  return chat.workerGetMessagesByID(req.query.workerID)
+router.get('/chat/restoreMessage', (req, res) => {
+  return chat.restoreMessage(req.query.userID)
     .then((x) => {
-      res.send(x)
-      return utils.res(res.statusCode, x)
+      res.send(JSON.stringify(x))
+      return x
     })
 })
 
-router.post('/chat/setChatExpire', (req, res) => {
-  let result = chat.setChatExpire(req.body.chatID)
-  res.send(result)
-  return utils.res(res.statusCode, result)
-})
 
-router.get('/worker/getAllWorkers', (req, res) => {
-  return worker.getAllWorkers()
-    .then((x) => {
-      res.send(x)
-      return utils.res(res.statusCode, x)
-    })
-})
+
 
 module.exports = router;

@@ -18,7 +18,8 @@ const login = (data) => {
                         userType: res.purpose === "adopt" ? "client" : "worker",
                         loginDate: utils.getDatetime("date"),
                         loginTime: utils.getDatetime("time"),
-                        token: res.purpose !== "adopt" ? res.workerToken.token : ""
+                        token: res.purpose !== "adopt" ? res.workerToken.token : "",
+                        email: data.email
                     }
                 } else {
                     console.log("incorrect email/password")

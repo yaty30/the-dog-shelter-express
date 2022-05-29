@@ -27,7 +27,8 @@ const createNewChat = (data) => {
                 time: utils.getDatetime("time"),
                 chatID: chatID,
                 messageID: messageID,
-                orderID: 1
+                orderID: 1,
+                messageType: "string"
             }
 
             return db.addDoc("chat", `${chatID}_${messageID}`, messageBody)
@@ -46,7 +47,8 @@ const replyMessage = (data) => {
             time: utils.getDatetime("time"),
             chatID: data.chatID,
             messageID: messageID,
-            orderID: orderID
+            orderID: orderID,
+            messageType: data.messageType
         }
 
         return db.addDoc("chat", `${data.chatID}_${messageID}`, messageBody)
@@ -66,12 +68,15 @@ const restoreMessage = (userID) => {
     let list = []
     return db.getAllDocs("chat")
         .then((res) => {
-            console.log(res)
+            console.log(userID)
             res.map((x, i) => {
                 (x.from === +userID || x.to === +userID) && list.push(x)
             })
         })
-        .then(() => list)
+        .then(() => {
+            console.log(list)
+            return list
+        })
 }
 
 module.exports = {

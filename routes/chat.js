@@ -57,7 +57,6 @@ const replyMessage = (data) => {
 }
 
 const deleteMessage = (data) => {
-    console.log(data)
     return db.removeDoc("chat", `${data.chatID}_${data.messageID}`)
         .then((res) =>
             res
@@ -68,13 +67,11 @@ const restoreMessage = (userID) => {
     let list = []
     return db.getAllDocs("chat")
         .then((res) => {
-            console.log(userID)
             res.map((x, i) => {
                 (x.from === +userID || x.to === +userID) && list.push(x)
             })
         })
         .then(() => {
-            console.log(list)
             return list
         })
 }

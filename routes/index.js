@@ -140,7 +140,10 @@ router.get('/chat/restoreMessage', (req, res) => {
     })
 })
 
-
+router.post('/contact/sendMessage', (req, res) => {
+  res.send(JSON.stringify(req.body))
+  return req.body
+})
 
 
 module.exports = router;
